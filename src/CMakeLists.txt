@@ -146,6 +146,17 @@ else( )
 	message( WARNING "Try setting Boost_DEBUG and Boost_DETAILED_FAILURE_MSG for more information" )
 endif( )
 
+# OpenCL version configuration
+if( NOT DEFINED CL_MINIMUM_OPENCL_VERSION )
+	set( CL_MINIMUM_OPENCL_VERSION 100 )
+endif( )
+
+if( NOT DEFINED CL_TARGET_OPENCL_VERSION )
+        set( CL_TARGET_OPENCL_VERSION 120 )
+endif( )
+
+configure_file(include/OpenCL_version.h.in include/OpenCL_version.h)
+
 # This will define OPENCL_FOUND
 find_package( OpenCL )
 
@@ -153,6 +164,8 @@ find_package( OpenCL )
 find_package( FFTW )
 
 # Enable building of the clACML client if both requested and all dependencies are found
+message(STATUS "BUILD_CLIENT = ${BUILD_CLIENT}")
+message(STATUS "Boost_FOUND = ${Boost_FOUND}")
 if( BUILD_CLIENT AND Boost_FOUND )
 	set( FFT_CLIENT ON )
 else( )
@@ -215,8 +228,8 @@ elseif( CMAKE_COMPILER_IS_GNUCXX )
 	endif( )
 
 	if( BUILD64 )
-		set( CMAKE_CXX_FLAGS "-m64 ${CMAKE_CXX_FLAGS}" )
-		set( CMAKE_C_FLAGS "-m64 ${CMAKE_C_FLAGS}" )
+		set( CMAKE_CXX_FLAGS "-march=native ${CMAKE_CXX_FLAGS}" )
+		set( CMAKE_C_FLAGS "-march=native ${CMAKE_C_FLAGS}" )
 	else( )
 		set( CMAKE_CXX_FLAGS "-m32 ${CMAKE_CXX_FLAGS}" )
 		set( CMAKE_C_FLAGS "-m32 ${CMAKE_C_FLAGS}" )
