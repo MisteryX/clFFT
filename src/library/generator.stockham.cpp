@@ -3490,9 +3490,9 @@ namespace StockhamGenerator
         clGetDeviceInfo(Dev_ID, CL_DEVICE_VENDOR, SizeParam_ret, nameVendor, NULL);
 
         //nv compiler doesn't support __constant kernel argument
-        if (strncmp(nameVendor, "NVIDIA",6)!=0)
-          str += "__constant cb_t *cb __attribute__((max_constant_size(32))), ";
-        else
+        //if (strncmp(nameVendor, "NVIDIA",6)!=0)
+        //  str += "__constant cb_t *cb __attribute__((max_constant_size(32))), ";
+        //else
           str += "__global cb_t *cb, ";
 
         delete [] nameVendor;
