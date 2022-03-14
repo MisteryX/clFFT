@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ########################################################################
-
+#!/usr/bin/python3
 import sys
 import argparse
 import subprocess
@@ -22,7 +22,7 @@ import re#gex
 import os
 import math
 from threading import Timer, Thread
-import thread, time
+import _thread, time
 from platform import system
 import numpy as np
 
@@ -112,7 +112,7 @@ subprocess.call('mkdir perfLog', shell = True)
 logfile = os.path.join('perfLog', (label+'-'+'fftMeasurePerfLog.txt'))
 
 def printLog(txt):
-    print txt
+    print(txt)
     log(logfile, txt)
 
 printLog("=========================MEASURE PERFORMANCE START===========================")
@@ -406,7 +406,7 @@ def check_for_1235_factors(values, option):
     for n in values:
         for m in n.replace('-',',').split(','):
             if not validate_number_for_1235(int(m)):
-                print 'ERROR: --{0} must specify number with only 1,2,3,5 as factors'.format(option)
+                printLog('ERROR: --{0} must specify number with only 1,2,3,5 as factors'.format(option))
                 quit()
             #print 'Valid number for :',option,':', m
        
@@ -591,7 +591,9 @@ if args.problemsize and args.problemsize[0] != 'None':
         # manually entered problem sizes should not be plotted (for now). they may still be output in a table if requested
 
 
-problem_size_combinations = problem_size_combinations + manual_test_combinations
+problem_size_combinations = list(problem_size_combinations)
+if manual_test_combinations:
+    problem_size_combinations.append(manual_test_combinations)
 
 #create final list of all transformations (with problem sizes and transform properties)
 test_combinations = itertools.product(problem_size_combinations, args.device, args.inputlayout, args.outputlayout, args.placeness, args.precision)
@@ -635,7 +637,7 @@ table.write(tableHeader + '\n')
 table.flush()
 if args.constProbSize == -1:
    args.constProbSize = maxBatchSize(1, 1, 1, args.inputlayout[0], args.precision[0], executable(args.library), '-' + args.device[0])
-args.constProbSize = int(args.constProbSize)
+args.constProbSize = int(float(args.constProbSize))
 
 
 printLog('Total combinations =  '+str(len(test_combinations)))
@@ -699,7 +701,7 @@ for params in test_combinations:
         elif inlayout[0]=='5' and outlayout[0]=='3':
           cuFFT_type='2'
         else:
-          print"Wrong input/outputlayout. Only C2C/R2C/C2R are supported for Cuda"
+          printLog("Wrong input/outputlayout. Only C2C/R2C/C2R are supported for Cuda")
           exit()
         arguments=[prefix+executable(args.library),
                      '-x', lengthx,
@@ -715,7 +717,7 @@ for params in test_combinations:
         arguments=' '.join(arguments)
         printLog('Executing Command: '+str(arguments))
         output = checkTimeOutPut(arguments)
-        output = output.split(os.linesep);
+        output = output.decode().split('\n')
         printLog('Execution Successfull---------------\n')
 
     except errorHandler.ApplicationException as ae:
@@ -723,7 +725,7 @@ for params in test_combinations:
         printLog('ERROR: Command is taking too much of time '+ae.message+'\n'+'Command: \n'+str(arguments))
         continue
     except subprocess.CalledProcessError as clientCrash:
-        print 'Command execution failure--->'
+        printLog('Command execution failure--->')
         if clientCrash.output.count('CLFFT_INVALID_BUFFER_SIZE'):
             writeline = False
             printLog('Omitting line from table - problem is too large')
@@ -741,9 +743,9 @@ for params in test_combinations:
     if writeline:
         try:
             if args.library == 'cuFFT':
-              output = itertools.ifilter( lambda x: x.count('gflops'), output)
+              output = filter( lambda x: x.count('gflops'), output)
             else:
-              output = itertools.ifilter( lambda x: x.count('gflops'), output)
+              output = filter( lambda x: x.count('gflops'), output)
 
             output = list(itertools.islice(output, None))
             thisResult = re.search('\d+\.*\d*e*-*\d*$', output[-1])
@@ -759,8 +761,8 @@ for params in test_combinations:
             outputRow = outputRow.rstrip(',')
             table.write(outputRow + '\n')
             table.flush()
-        except:
-			printLog('ERROR: Exception occurs in GFLOP parsing')
+        except Exception as e:
+            printLog('ERROR: Exception occurs in GFLOP parsing - ' + str(e))
     else:
         if(len(output) > 0):
             if output[0].find('nan') or output[0].find('inf'):

@@ -82,25 +82,25 @@ def transformDimension(x,y,z):
 
 def executable(library):
     if type(library) != str:
-        print 'ERROR: expected library name to be a string'
+        print('ERROR: expected library name to be a string')
         quit()
 
-    if sys.platform != 'win32' and sys.platform != 'linux2':
-        print 'ERROR: unknown operating system'
+    if sys.platform != 'win32' and sys.platform != 'linux':
+        print('ERROR: unknown operating system')
         quit()
 
     if library == 'clFFT' or library == 'null':
         if sys.platform == 'win32':
             exe = 'clFFT-client.exe'
-        elif sys.platform == 'linux2':
+        elif sys.platform == 'linux':
             exe = 'clFFT-client'
     elif library == 'cuFFT':
         if sys.platform == 'win32':
             exe = 'cuFFT-client.exe'
-        elif sys.platform == 'linux2':
+        elif sys.platform == 'linux':
             exe = 'cuFFT-client'
     else:
-        print 'ERROR: unknown library -- cannot determine executable name'
+        print('ERROR: unknown library -- cannot determine executable name')
         quit()
 
     return exe
@@ -121,7 +121,7 @@ def max_problem_size(exe, layout, precision, device):
     elif precision == 'double':
         bytes_in_one_number = 8
     else:
-        print 'max_problem_size(): unknown precision'
+        print('max_problem_size(): unknown precision')
         quit()
 
     max_problem_size = pow(2,25)
@@ -302,6 +302,6 @@ def open_file( filename ):
             oldname = filename
             filename = filename + datetime.now().isoformat().replace(':','.')
             message = 'A file with the name ' + oldname + ' already exists. Changing filename to ' + filename
-            print message
+            print(message)
     
     return open(filename, 'w')

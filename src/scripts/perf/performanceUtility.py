@@ -26,7 +26,7 @@ def currentUser():
     try:
         return check_output("who", shell = True).split()[0];
     except:
-        print 'Unhandled Exception at performanceUtility::currentUser()'
+        print('Unhandled Exception at performanceUtility::currentUser()')
         raise
     
 #Details: Generate sorted numbers in radices of 2,3 and 5 upto a given upper limit number
